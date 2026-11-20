@@ -14,5 +14,8 @@ dependencies = [
     "rbf2d @ git+https://github.com/AEArtemyev/rbf2d.git@main",
 ]
 
+[project.optional-dependencies]
+geometry = ["shapely>=2.0"]
+
 [tool.setuptools.packages.find]
 include = ["rbffd2d"]

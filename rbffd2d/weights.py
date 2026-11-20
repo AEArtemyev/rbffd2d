@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from .neighbors import find_neighbors, _points, _search_tree
+from .neighbors import find_neighbors, _points, _search_tree, _neighbor_ids
 from .polynomials import (
     monomial_exponents,
     get_poly, get_poly_x, get_poly_y, get_poly_xx, get_poly_yy, get_poly_xy,
@@ -66,7 +66,8 @@ def compute_weights(points, col_point, rbf, poly_order=2):
 
 
 def build_weights(nodes, rbf, search_mode="polyOrder", stencil_size=15,
-                  poly_order=2, rho=2.5, *, tol=1e-6, search_data=None, tree=None):
+                  poly_order=2, rho=2.5, *, tol=1e-6, search_data=None, tree=None,
+                  domain=None):
     """Return (neighbors, weights) at nodes, searching in search_data.
 
     Pass tree to reuse a cKDTree instead of supplying search_data. The same
@@ -80,13 +81,18 @@ def build_weights(nodes, rbf, search_mode="polyOrder", stencil_size=15,
     shells, keeping the degree fixed. Raise numpy.linalg.LinAlgError if all
     search points are exhausted or the full system is singular. Undefined
     kernel values raise ValueError.
+    With domain (a shapely.Polygon), both initial search and expansion use
+    only nodes directly visible from each query, including boundary contacts.
+    Too few initial visible nodes raise ValueError; exhaustion during rank
+    recovery raises numpy.linalg.LinAlgError. RBFs and derivatives retain
+    Euclidean distances. See find_neighbors for domain validation and reuse.
     """
     nodes = _points(nodes, "nodes")
     tree = _search_tree(nodes, search_data, tree)
     search = tree.data
     neighbors = find_neighbors(
         nodes, usage=search_mode, stencil_size=stencil_size,
-        poly_order=poly_order, rho=rho, tol=tol, tree=tree,
+        poly_order=poly_order, rho=rho, tol=tol, tree=tree, domain=domain,
     )
     weights = []
     poly_data = {}
@@ -104,12 +110,13 @@ def build_weights(nodes, rbf, search_mode="polyOrder", stencil_size=15,
                 raise np.linalg.LinAlgError(
                     f"rank-deficient polynomial block at query {i}: search points exhausted"
                 )
-            distance, _ = tree.query(nodes[i], k=[len(ids)+1])
-            radius = np.nextafter(distance[0] + tol, np.inf)
-            ids = np.asarray(tree.query_ball_point(nodes[i], radius), dtype=int)
-            delta = search[ids] - nodes[i]
-            distances = np.hypot(delta[:, 0], delta[:, 1])
-            ids = ids[np.lexsort((ids, distances))]
+            expanded = _neighbor_ids(nodes[i], tree, len(ids)+1, tol, domain)
+            if len(expanded) <= len(ids):
+                raise np.linalg.LinAlgError(
+                    f"rank-deficient polynomial block at query {i}: "
+                    "visible search points exhausted"
+                )
+            ids = expanded
         neighbors[i] = ids
         try:
             weights.append(_solve_weights(points, rbf, poly_matrix, poly_rhs))
