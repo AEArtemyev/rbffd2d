@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rbffd2d"
+version = "0.1.0"
+description = "Two-dimensional RBF-FD stencils and differentiation weights"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.23", "scipy>=1.9", "rbf2d>=0.1.0"]
+
+[tool.setuptools.packages.find]
+include = ["rbffd2d"]
