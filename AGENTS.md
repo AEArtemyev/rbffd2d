@@ -1,5 +1,15 @@
 # Engineering Principles
 
+## Project goal
+
+The project's goal is to provide two core capabilities: finding neighboring
+nodes and computing RBF-FD weights with polynomial augmentation.
+
+These capabilities belong in one project because weight computation sometimes
+requires expanding the stencil and searching for neighbors again. Keeping them
+together allows reuse of the search code and the existing search tree, avoiding
+the cost of rebuilding the tree during weight computation.
+
 ## Agent skills
 
 ### Issue tracker
