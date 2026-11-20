@@ -15,7 +15,7 @@ OPERATORS = ("f", "dx", "dy", "dxx", "dyy", "dxy")
 
 
 def build_weights(nodes, rbf, search_mode="polyOrder", stencil_size=15,
-                  poly_order=2, rho=2, *, tol=1e-6):
+                  poly_order=2, rho=2.5, *, tol=1e-6):
     """Return (neighbors, weights) for all nodes.
 
     Each weights[i] has shape (len(neighbors[i]), 6), with columns

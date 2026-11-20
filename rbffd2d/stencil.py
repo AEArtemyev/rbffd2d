@@ -34,7 +34,7 @@ def get_rbf_fd_stencil_size(m, d, rho=2.5, mode="stable"):
     return n, nm
 
 
-def get_poly_order(n, d, rho=2.0, mode="stable"):
+def get_poly_order(n, d, rho=2.5, mode="stable"):
     """Return the largest degree m with comb(m+d, d) <= the point budget.
 
     n is a positive stencil size; d must be 2 or 3.

@@ -1,6 +1,6 @@
 """Checks for stencil size and polynomial degree selection."""
 
-from math import comb
+from math import ceil, comb
 import unittest
 
 import numpy as np
@@ -20,15 +20,15 @@ class TestStencil(unittest.TestCase):
         self.assertEqual(get_rbf_fd_stencil_size(0, 2, 0.5), (1, 1))
 
     def test_poly_order(self):
-        self.assertEqual(get_poly_order(12, 2), 2)
-        self.assertEqual(get_poly_order(11, 2), 1)
-        self.assertEqual(get_poly_order(20, 3), 2)
-        self.assertEqual(get_poly_order(19, 3), 1)
+        self.assertEqual(get_poly_order(15, 2), 2)
+        self.assertEqual(get_poly_order(14, 2), 1)
+        self.assertEqual(get_poly_order(25, 3), 2)
+        self.assertEqual(get_poly_order(24, 3), 1)
         self.assertEqual(get_poly_order(6, 2, mode="max"), 2)
         self.assertEqual(get_poly_order(5, 2, mode="max"), 1)
         self.assertEqual(get_poly_order(1, 2, mode="max"), 0)
         self.assertEqual(get_poly_order(1, 2, 0.5), 0)
-        self.assertEqual(get_poly_order(2, 2), 0)
+        self.assertEqual(get_poly_order(3, 2), 0)
         self.assertEqual(get_poly_order(16, 2, 2.5), 2)
 
     def test_degree_thresholds(self):
@@ -38,15 +38,15 @@ class TestStencil(unittest.TestCase):
                 with self.subTest(d=d, m=m):
                     self.assertEqual(get_poly_order(nm, d, mode="max"), m)
                     self.assertEqual(get_poly_order(nm-1, d, mode="max"), m-1)
-                    self.assertEqual(get_poly_order(2*nm, d), m)
-                    self.assertEqual(get_poly_order(2*nm-1, d), m-1)
+                    self.assertEqual(get_poly_order(ceil(2.5*nm), d), m)
+                    self.assertEqual(get_poly_order(ceil(2.5*nm)-1, d), m-1)
                     n, count = get_rbf_fd_stencil_size(m, d, 2.5)
                     self.assertEqual(count, nm)
                     self.assertEqual(get_poly_order(n, d, 2.5), m)
 
     def test_numeric_scalar_types(self):
         self.assertEqual(get_rbf_fd_stencil_size(2.0, np.int64(2)), (15, 6))
-        self.assertEqual(get_poly_order(np.int64(12), 2.0, np.float64(2)), 2)
+        self.assertEqual(get_poly_order(np.int64(15), 2.0, np.float64(2.5)), 2)
 
     def test_insufficient_budget(self):
         with self.assertRaises(ValueError):

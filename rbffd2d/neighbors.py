@@ -16,7 +16,7 @@ def _points(data, name):
 
 
 def find_neighbors(query_data, search_data=None, *, usage="polyOrder",
-                   stencil_size=15, poly_order=2, rho=2, tol=1e-6):
+                   stencil_size=15, poly_order=2, rho=2.5, tol=1e-6):
     """Return a list of zero-based neighbor index arrays, sorted by distance.
 
     Search among query_data if search_data is omitted or empty.

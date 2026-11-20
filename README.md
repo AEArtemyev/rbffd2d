@@ -46,7 +46,7 @@ neighbors, weights = build_weights(nodes, PHS(3), poly_order=2)
 `find_neighbors(query_data, search_data=None, usage="polyOrder", ...)`
 возвращает список массивов индексов с нуля. Без `search_data` поиск идёт
 среди `query_data`. Режим `stencilSize` задаёт размер через `stencil_size`,
-а `polyOrder` — через `poly_order` и `rho` (по умолчанию 2).
+а `polyOrder` — через `poly_order` и `rho` (по умолчанию 2.5).
 Включаются все соседи до расстояния последнего обязательного соседа плюс
 `tol` (по умолчанию `1e-6`), включая саму точку.
 
@@ -114,7 +114,7 @@ derivative = eval_monomial_deriv(exps, 2, -3, 3, 2) @ coefficients  # 77784
 `(n, Nm)`: число соседей и число мономов `Nm = C(m+d, d)`.
 В режиме `min` число соседей равно `Nm`, в `stable` — `ceil(rho*Nm)`.
 
-`get_poly_order(n, d, rho=2.0, mode="stable")` возвращает наибольшую степень,
+`get_poly_order(n, d, rho=2.5, mode="stable")` возвращает наибольшую степень,
 для которой `C(m+d, d) <= n/rho`; режим `max` использует `n` вместо `n/rho`.
 Поддерживаются размерности 2 и 3. При `n/rho < 1` в режиме `stable`
 возникает `ValueError`. Название режима `stable` не гарантирует устойчивость.

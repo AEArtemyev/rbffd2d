@@ -38,6 +38,10 @@ class TestNeighbors(unittest.TestCase):
         for point, ids in zip(query, neighbors):
             distances = np.linalg.norm(points-point, axis=1)
             assert_array_equal(ids, np.argsort(distances)[:7])
+        neighbors = find_neighbors(query, points, poly_order=2, tol=0)
+        for point, ids in zip(query, neighbors):
+            distances = np.linalg.norm(points-point, axis=1)
+            assert_array_equal(ids, np.argsort(distances)[:15])
         options = dict(usage="stencilSize", stencil_size=1)
         for data in (None, []):
             result = find_neighbors(points, data, **options)
@@ -70,7 +74,9 @@ class TestWeights(unittest.TestCase):
         for mode in ("polyOrder", "stencilSize"):
             ids_list, weights = build_weights(self.nodes, PHS(3), mode, stencil_size=12)
             for i, (ids, w) in enumerate(zip(ids_list, weights)):
-                degree = 2 if mode == "polyOrder" else get_poly_order(len(ids), 2, 2)
+                if mode == "polyOrder":
+                    self.assertGreaterEqual(len(ids), 15)
+                degree = 2 if mode == "polyOrder" else get_poly_order(len(ids), 2, 2.5)
                 exps = monomial_exponents(degree)
                 values = get_poly(*self.nodes[ids].T, exps)
                 expected = np.column_stack([f(*self.nodes[i], exps) for f in POLYNOMIALS])
@@ -98,7 +104,7 @@ class TestWeights(unittest.TestCase):
         with self.assertRaises(ValueError):
             build_weights(self.nodes, RadialPower(1))
         with self.assertRaises(np.linalg.LinAlgError):
-            build_weights(np.zeros((12, 2)), PHS(3))
+            build_weights(np.zeros((15, 2)), PHS(3))
 
 
 if __name__ == "__main__":
