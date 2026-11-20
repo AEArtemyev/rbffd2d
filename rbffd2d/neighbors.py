@@ -15,17 +15,31 @@ def _points(data, name):
     return points
 
 
+def _search_tree(query, search_data, tree):
+    if tree is not None:
+        if search_data is not None:
+            raise ValueError("pass either search_data or tree, not both")
+        if not isinstance(tree, cKDTree):
+            raise TypeError("tree must be a scipy.spatial.cKDTree")
+        if tree.m != 2:
+            raise ValueError("tree must contain two-dimensional points")
+        return tree
+    search = query if search_data is None or np.size(search_data) == 0 else _points(search_data, "search_data")
+    return cKDTree(search)
+
+
 def find_neighbors(query_data, search_data=None, *, usage="polyOrder",
-                   stencil_size=15, poly_order=2, rho=2.5, tol=1e-6):
+                   stencil_size=15, poly_order=2, rho=2.5, tol=1e-6, tree=None):
     """Return a list of zero-based neighbor index arrays, sorted by distance.
 
-    Search among query_data if search_data is omitted or empty.
+    Pass tree to reuse a cKDTree instead of supplying search_data. Indices
+    then refer to tree.data. Do not modify the tree's underlying coordinates.
+    Search among query_data if both are omitted or search_data is empty.
     usage='stencilSize' uses stencil_size; usage='polyOrder' uses the size
     for poly_order and rho. Include all points within the kth distance + tol.
     Query points belonging to the search set are included.
     """
     query = _points(query_data, "query_data")
-    search = query if search_data is None or np.size(search_data) == 0 else _points(search_data, "search_data")
     if (isinstance(tol, (bool, np.bool_)) or not isinstance(tol, Real)
             or not np.isfinite(tol) or tol < 0):
         raise ValueError("tol must be finite and nonnegative")
@@ -35,9 +49,10 @@ def find_neighbors(query_data, search_data=None, *, usage="polyOrder",
         size, _ = get_rbf_fd_stencil_size(poly_order, 2, rho)
     else:
         raise ValueError("usage must be 'stencilSize' or 'polyOrder'")
-    if size > len(search):
+    tree = _search_tree(query, search_data, tree)
+    search = tree.data
+    if size > tree.n:
         raise ValueError("stencil size exceeds the number of search points")
-    tree = cKDTree(search)
     distances, _ = tree.query(query, k=[size])
     radii = np.nextafter(distances[:, 0] + tol, np.inf)
     neighbors = []
