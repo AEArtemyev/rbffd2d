@@ -2,10 +2,10 @@
 
 ## Project goal
 
-The project's goal is to support the numerical solution of partial differential
-equations (PDEs) using RBF-FD in two-dimensional domains. It provides two core
-capabilities for discretizing differential operators: finding neighboring nodes
-and computing RBF-FD weights with polynomial augmentation.
+The project provides tools for discretizing differential operators using RBF-FD
+in two-dimensional domains as part of the numerical solution of partial
+differential equations (PDEs). Its two core capabilities are finding neighboring
+nodes and computing RBF-FD weights with polynomial augmentation.
 
 These capabilities belong in one project because weight computation sometimes
 requires expanding the stencil and searching for neighbors again. Keeping them
