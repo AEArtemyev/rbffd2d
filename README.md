@@ -1,12 +1,33 @@
 # rbffd2d
 
 Функции поиска соседей и вычисления весов RBF-FD с полиномиальным дополнением.
-Зависит от отдельной библиотеки `rbf2d`. При расположении проектов рядом:
+Зависит от отдельной библиотеки [rbf2d](https://github.com/AEArtemyev/rbf2d).
+
+## Установка
+
+Из каталога проекта:
 
 ```bash
 python3 -m venv .venv
-.venv/bin/python -m pip install -e ../rbf2d -e .
+.venv/bin/python -m pip install .
 ```
+
+Нужны Python 3.10 или новее, Git и доступ к GitHub и PyPI.
+Библиотека `rbf2d` устанавливается автоматически из ветки `main` на GitHub.
+
+Для совместной разработки расположите проекты рядом и установите их
+в редактируемом режиме:
+
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install -e ../rbf2d "numpy>=1.23" "scipy>=1.9"
+.venv/bin/python -m pip install --no-deps -e .
+```
+
+Здесь зависимости устанавливаются первой командой. Флаг `--no-deps`
+во второй сохраняет локальный `rbf2d` вместо установки версии из GitHub.
+
+## Использование
 
 Ядра находятся в `rbf2d`, функции для RBF-FD — в `rbffd2d`.
 
@@ -99,7 +120,7 @@ derivative = eval_monomial_deriv(exps, 2, -3, 3, 2) @ coefficients  # 77784
 возникает `ValueError`. Название режима `stable` не гарантирует устойчивость.
 
 
-Проверка:
+## Проверка
 
 ```bash
 .venv/bin/python -B -m unittest discover -s tests

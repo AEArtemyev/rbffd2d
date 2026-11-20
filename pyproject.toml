@@ -8,7 +8,11 @@ version = "0.1.0"
 description = "Two-dimensional RBF-FD stencils and differentiation weights"
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = ["numpy>=1.23", "scipy>=1.9", "rbf2d>=0.1.0"]
+dependencies = [
+    "numpy>=1.23",
+    "scipy>=1.9",
+    "rbf2d @ git+https://github.com/AEArtemyev/rbf2d.git@main",
+]
 
 [tool.setuptools.packages.find]
 include = ["rbffd2d"]
